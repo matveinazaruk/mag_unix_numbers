@@ -1,13 +1,18 @@
-TARGET = guess-server
+TARGETSRV = guess-server
+TARGETCLT = guess-client
+
 CFLAGS = -Wall -Wextra --std=gnu99 -g -O2 -MD -MP
-SRCS = io.c numbers.c server.c
+SRCSSRV = io.c numbers.c server.c
+SRCSCLT = io.c client.c
 
-all: $(TARGET)
+all: $(TARGETSRV) $(TARGETCLT)
 
-$(TARGET): $(SRCS:%.c=%.o)
+$(TARGETSRV): $(SRCSSRV:%.c=%.o)
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(TARGETCLT): $(SRCSCLT:%.c=%.o)
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f $(TARGET) $(SRCS:%.c=%.o) $(SRCS:%.c=%.d)
-
--include $(SRCS:%.c=%.d)
+	rm -f $(TARGETSRV) $(SRCSSRV:%.c=%.o) $(SRCSSRV:%.c=%.d)
+	rm -f $(TARGETCLT) $(SRCSCLT:%.c=%.o) $(SRCSCLT:%.c=%.d)
