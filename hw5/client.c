@@ -1,21 +1,15 @@
 #include "io.h"
 
 #include <errno.h>
-#include <inttypes.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <string.h>
 
-#define SOCK_PATH "echo_socket"
 #define MIN 0
 #define MAX 1000000000
 
@@ -42,7 +36,7 @@ uint32_t BinarySearch(const int sockfd) {
     uint32_t toSend, guess;
     char result = ' ';
 
-    while (!Equals(result) && left != right) {
+    while (!Equals(result) && left <= right) {
         guess = (left + right) / 2;
         fprintf(stderr, "Client try to guess: %d\n", guess);
         toSend = htonl(guess);
@@ -59,9 +53,9 @@ uint32_t BinarySearch(const int sockfd) {
         fprintf(stderr, "Result is: x %c %d\n", result, guess);
 
         if (Less(result)) {
-            right = guess;
+            right = guess - 1;
         } else if (Greater(result)) {
-            left = guess;
+            left = guess + 1;
         }
 
     }
@@ -91,7 +85,7 @@ int main(int argc, char* argv[])
     remote.sun_family = AF_UNIX;
     strcpy(remote.sun_path, socketPath);
     socklen_t remoteLen = sizeof(remote);
-    
+
     if (connect(sockfd, (struct sockaddr *)&remote, remoteLen) == -1) {
         perror("connect");
         exit(1);
